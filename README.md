@@ -27,7 +27,7 @@ The four buttons in the popup perform the following functions:
 
 ## Installation
 
-Download ```tagger.zpi``` from this repository, and use Thundebird's Add-ons Manager to install the extension from this downloaded file.
+Download ```tagger.xpi``` from this repository, and use Thundebird's Add-ons Manager to install the extension from this downloaded file.
 
 ## Motivation
 
