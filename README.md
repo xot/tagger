@@ -25,6 +25,16 @@ The four buttons in the popup perform the following functions:
 - Clear: removes all tags from the selected messages.
 - Close: closes the popup and does nothing. Pressing ESC or clicking outside the popup does the same.
 
+## Installation
+
+Download ```tagger.zpi``` from this repository, and use Thundebird's Add-ons Manager to install the extension from this downloaded file.
+
+## Motivation
+
+Tagger is especially useful for people that use a lot of tags to organise their emails, instead of using topic based folders. Instead of having to decide which folder an email should be archived in (perhaps sometimes even copying emails to several folders to be sure), one can easily add different tags to an email, and use the standard Thunderbird archiving method to archive them for later. 
+
+It is worth noting that Thunderbird typically stores the tags assigned to an email with the email itself using the X-Mozilla-Keys header, except for mails that arrive over IMAP (and that are later archived). To *ensure* the tags are stored with the emails themselves in the archive folder, note that compacting a folder will store tag information within the emails in the folder. Unfortunately, Thunderbird ignores a compact command for folders to which only messages have been added since the last compact command. To *force* compacting a folder, therefore first add a dummy messages to it, and immediately delete it, before requesting the compact operation.
+
 
 ## Limitations
 
