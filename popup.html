@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Details</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="popup.css">
+</head>
+
+<body>
+  <form id="inputform">
+    <div>
+      <input id="selectedtag" type="search" list="tags" autocomplete="off"
+	     placeholder="Start typing to search tag..">
+      <datalist id="tags">
+	<option value="eerste"/>
+	<option value="tweede"/>
+	<option value="derde"/>
+         </datalist>
+      <input id="button_ok" type="submit" data="ok" value="Add">
+      <input id="button_new" type="button" data="new"
+	     value="Create + add">      
+      <input id="button_clear" type="button" data="clear"
+	     value="Clear">      
+      <input id="button_cancel" type="button" data="cancel"
+	     value="Cancel">      
+    </div>
+  </form>
+  <script type="module" src="popup.js" defer="true"></script>
+</body>
+
+</html>
