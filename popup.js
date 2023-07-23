@@ -1,16 +1,3 @@
-// Get a list of known tags; this is a list of elements containing a key
-// and a tag; the key is a normalised version of the tag used internally
-// by Thunderbird: no uppercase, and spaces changed to underscore.
-//console.log('Popup: Getting tags')
-let tags = await messenger.messages.listTags();
-
-// construct an option list for the input selector
-let knowntags = '';
-tags.forEach(element => {
-    knowntags = knowntags.concat('<option value="',element.tag,'" />');
-});
-// and set it
-document.getElementById("tags").innerHTML = knowntags;
 
 // send command and tag to background process to apply to selected messages
 async function tagCommand(command) {
@@ -52,14 +39,32 @@ function notifyCancel(event) {
     //console.log("Popup: Closing window") ;
     window.close();
 }
-    
-// register the handlers
-// (by creating a form, pressing return activates the submit action, while
-//  esc cancels the form)
-document.getElementById("inputform").addEventListener("submit", notifyOK);
-document.getElementById("button_new").addEventListener("click", notifyNew);
-document.getElementById("button_clear").addEventListener("click", notifyClear);
-document.getElementById("button_cancel").addEventListener("click", notifyCancel);
 
-// put focus on the tag input field 
-document.getElementById("selectedtag").focus();
+async function init() {
+    // Get a list of known tags; this is a list of elements containing a key
+    // and a tag; the key is a normalised version of the tag used internally
+    // by Thunderbird: no uppercase, and spaces changed to underscore.
+    //console.log('Popup: Getting tags')
+    let tags = await messenger.messages.listTags();
+
+    // construct an option list for the input selector
+    let knowntags = '';
+    tags.forEach(element => {
+	knowntags = knowntags.concat('<option value="',element.tag,'" />');
+    });
+    // and set it
+    document.getElementById("tags").innerHTML = knowntags;
+
+    // register the handlers
+    // (by creating a form, pressing return activates the submit action, while
+    //  esc cancels the form)
+    document.getElementById("inputform").addEventListener("submit", notifyOK);
+    document.getElementById("button_new").addEventListener("click", notifyNew);
+    document.getElementById("button_clear").addEventListener("click", notifyClear);
+    document.getElementById("button_cancel").addEventListener("click", notifyCancel);
+
+    // put focus on the tag input field 
+    document.getElementById("selectedtag").focus();
+}
+
+init()
