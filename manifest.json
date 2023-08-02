@@ -2,12 +2,12 @@
     "manifest_version": 2,
     "name": "Tagger",
     "description": "Tagging messages by autocompletion",
-    "version": "1.1",
+    "version": "1.2",
     "author": "Jaap-Henk Hoepman",
     "browser_specific_settings": {
         "gecko": {
             "id": "tagger@xot.nl",
-            "strict_min_version": "78.0"
+            "strict_min_version": "102.0"
         }
     },
     "browser_action": {
