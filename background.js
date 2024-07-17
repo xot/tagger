@@ -141,8 +141,10 @@ async function newMailHandler(folder,messageList) {
 	    // strip < and >
 	    reply_message_id = reply_message_id.substring(1,reply_message_id.length-1) 
 	    console.log("Stripped reply to:",reply_message_id ) ;
+	    // find message with this message id
 	    let result = await messenger.messages.query( {headerMessageId: reply_message_id} )
 	    if (result.messages.length > 0) {
+		// if found, add its tags to the incoming message
 		let reply_msg = result.messages[0]
 		let reply_tags = reply_msg.tags
 		console.log("Tags found:",reply_tags,". Adding them.") ;
