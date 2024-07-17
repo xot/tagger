@@ -1,3 +1,13 @@
+//TODO: https://developer.thunderbird.net/add-ons/updating/tb102/adapt-to-changes-in-thunderbird-92-102#chromeutils.import
+//var { MailServices } = ChromeUtils.importESModule(
+//  "resource:///modules/MailServices.sys.mjs"
+//);
+
+/**
+ * Part I: Handlign tagging popup
+ */
+
+
 /**
  * Add an event handler for the popup
  *
@@ -36,17 +46,20 @@ async function getTagKey(tag) {
 }
 
 function addTag(tag) {
-    //console.log("Popup: Adding new tag:", tag) ;
+    console.log("Popup: Adding new tag:", tag) ;
     // key must match /^[$a-zA-Z0-9]+$/)
     // (this is different for tags created through the manage tags
     // interface...)
     // make lowercase, trim and remove all illegal chars
     let key = tag.toLowerCase() ;
     key = key.trim() ;
-    key = key.replaceAll(/[^$a-zA-Z0-9]/g,'') ;
-    //console.log("Popup: With key:", key) ;
+    //key = key.replaceAll(/[^$a-zA-Z0-9]/g,'') ;
+    console.log("Popup: With key:", key) ;
     messenger.messages.createTag(key,tag,"#000000");
     return key;
+    // TODO: this is what we shoudl use to create the same key Thunderbird would
+    //MailServices.tags.addTag(tag,"#000000", "");
+    //return MailServices.tags.getKeyForTag(tag);
 }
 
 
@@ -105,3 +118,41 @@ async function commandHandler(message, sender) {
     }
     return true;
 }
+
+/**
+ * Part II: Automatically add tags on incoming messages based using tags 
+ * of messages in thread.  WORK IN PROGRESS
+ */
+
+// The actual (asynchronous) handler for incoming messages.
+async function newMailHandler(folder,messageList) {
+    // get incoming message
+    let message = messageList.messages[0] ;
+    let author = message.author.toLowerCase() ;
+    console.log("New message from", author) ;
+    // get the full message, and then the in-reply-tos from header
+    let msg_part = await messenger.messages.getFull(message.id) ;
+    if ('in-reply-to' in msg_part.headers) {
+	let in_reply_tos = msg_part.headers['in-reply-to'] ;
+	if (in_reply_tos.length > 0) {
+	    // get first in-reply-to message id
+	    let reply_message_id = in_reply_tos[0]
+	    console.log("Reply to:",reply_message_id ) ;
+	    // strip < and >
+	    reply_message_id = reply_message_id.substring(1,reply_message_id.length-1) 
+	    console.log("Stripped reply to:",reply_message_id ) ;
+	    let result = await messenger.messages.query( {headerMessageId: reply_message_id} )
+	    if (result.messages.length > 0) {
+		let reply_msg = result.messages[0]
+		let reply_tags = reply_msg.tags
+		console.log("Adding tags:",reply_tags) ;
+		messenger.messages.update(message.id, { tags: reply_tags }) 
+	    }
+	}
+    }
+}
+
+// Handle incoming new message
+browser.messages.onNewMailReceived.addListener((folder, messageList) => {
+    newMailHandler(folder,messageList);    
+});

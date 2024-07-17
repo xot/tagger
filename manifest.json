@@ -22,7 +22,9 @@
 	}
     },
     "permissions": [
+	"accountsRead",
         "messagesRead",
+        "messagesUpdate",	
 	"messagesTags"
     ],
     "background": {
