@@ -128,16 +128,16 @@ async function commandHandler(message, sender) {
 async function newMailHandler(folder,messageList) {
     // get incoming message
     let message = messageList.messages[0] ;
-    let author = message.author.toLowerCase() ;
-    console.log("New message from", author) ;
-    // get the full message, and then the in-reply-tos from header
+    console.log("Tagger processing new message from", message.author.toLowerCase()) ;
+    // get the full message
     let msg_part = await messenger.messages.getFull(message.id) ;
+    // get the in-reply-to headers, if present
     if ('in-reply-to' in msg_part.headers) {
 	let in_reply_tos = msg_part.headers['in-reply-to'] ;
 	if (in_reply_tos.length > 0) {
 	    // get first in-reply-to message id
 	    let reply_message_id = in_reply_tos[0]
-	    console.log("Reply to:",reply_message_id ) ;
+	    console.log("Reply to found:",reply_message_id ) ;
 	    // strip < and >
 	    reply_message_id = reply_message_id.substring(1,reply_message_id.length-1) 
 	    console.log("Stripped reply to:",reply_message_id ) ;
@@ -145,7 +145,7 @@ async function newMailHandler(folder,messageList) {
 	    if (result.messages.length > 0) {
 		let reply_msg = result.messages[0]
 		let reply_tags = reply_msg.tags
-		console.log("Adding tags:",reply_tags) ;
+		console.log("Tags found:",reply_tags,". Adding them.") ;
 		messenger.messages.update(message.id, { tags: reply_tags }) 
 	    }
 	}
