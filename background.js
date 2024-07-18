@@ -2,6 +2,9 @@
 //var { MailServices } = ChromeUtils.importESModule(
 //  "resource:///modules/MailServices.sys.mjs"
 //);
+//
+// MAYBE USE Experiment APIs, see https://developer.thunderbird.net/add-ons/mailextensions
+
 
 /**
  * Part I: Handlign tagging popup
@@ -120,12 +123,17 @@ async function commandHandler(message, sender) {
 }
 
 /**
- * Part II: Automatically add tags on incoming messages based using tags 
- * of messages in thread.  WORK IN PROGRESS
+ * Part II: Automatically add tags on incoming replies using tags 
+ * of message replied to.
  */
 
 // The actual (asynchronous) handler for incoming messages.
 async function newMailHandler(folder,messageList) {
+    var val = await messenger.storage.local.get('tagreplies') ;
+    if (!val.tagreplies) {
+	console.log("Tagger not tagging incoming reply.") ;
+	return ;
+    } 
     // get incoming message
     let message = messageList.messages[0] ;
     console.log("Tagger processing new message from", message.author.toLowerCase()) ;
@@ -136,17 +144,17 @@ async function newMailHandler(folder,messageList) {
 	let in_reply_tos = msg_part.headers['in-reply-to'] ;
 	if (in_reply_tos.length > 0) {
 	    // get first in-reply-to message id
-	    let reply_message_id = in_reply_tos[0]
+	    let reply_message_id = in_reply_tos[0] ;
 	    console.log("Reply to found:",reply_message_id ) ;
 	    // strip < and >
-	    reply_message_id = reply_message_id.substring(1,reply_message_id.length-1) 
+	    reply_message_id = reply_message_id.substring(1,reply_message_id.length-1) ;
 	    console.log("Stripped reply to:",reply_message_id ) ;
 	    // find message with this message id
 	    let result = await messenger.messages.query( {headerMessageId: reply_message_id} )
 	    if (result.messages.length > 0) {
 		// if found, add its tags to the incoming message
-		let reply_msg = result.messages[0]
-		let reply_tags = reply_msg.tags
+		let reply_msg = result.messages[0] ;
+		let reply_tags = reply_msg.tags ;
 		console.log("Tags found:",reply_tags,". Adding them.") ;
 		messenger.messages.update(message.id, { tags: reply_tags }) 
 	    }

@@ -62,7 +62,6 @@ async function init() {
     document.getElementById("button_new").addEventListener("click", notifyNew);
     document.getElementById("button_clear").addEventListener("click", notifyClear);
     document.getElementById("button_cancel").addEventListener("click", notifyCancel);
-
     // put focus on the tag input field 
     document.getElementById("selectedtag").focus();
 }
