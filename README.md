@@ -10,6 +10,8 @@ Released under the [MIT](https://opensource.org/licenses/MIT) license.
 
 Tagger is a Thunderbird extension that allows you to quickly tag selected messages from a large list of existing tags using autocompletion. It also allows you to create and add new tags, or clear all currently set tags, on selected messages.
 
+Moreover, it can also automatically tag incoming replies copying the tag(s) of the message it replies to. This option can be checked in the Options page of this extension.
+
 ## Interface
 
 Tagger installs a 'Tagger' button on Thunderbird's toolbar that opens a popup when clicked (or when pressing Ctrl-T on Windows or Command-T on Macos).
