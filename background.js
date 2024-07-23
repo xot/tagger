@@ -57,6 +57,7 @@ function addTag(tag) {
     let key = tag.toLowerCase() ;
     key = key.trim() ;
     //key = key.replaceAll(/[^$a-zA-Z0-9]/g,'') ;
+    key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
     console.log("Popup: With key:", key) ;
     messenger.messages.createTag(key,tag,"#000000");
     return key;
@@ -162,7 +163,18 @@ async function newMailHandler(folder,messageList) {
     }
 }
 
-// Handle incoming new message
+
+//async function folderUpdatedHandler(folder, folderInfo) {
+//    console.log("Event triggered for account folder",folder,folderInfo) ;
+//    let result = await messenger.messages.query( {folderId: folder.id} ) ;
+//    console.log(result) ;
+//}
+
+// Handle incoming new message from a server
 browser.messages.onNewMailReceived.addListener((folder, messageList) => {
     newMailHandler(folder,messageList);    
 });
+// Also handle new messages stored in folder, e.g. my own replies
+//messenger.folders.onFolderInfoChanged.addListener((folder, folderInfo) => {
+//    folderUpdatedHandler(folder, folderInfo); 
+//}) ;
