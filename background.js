@@ -38,7 +38,7 @@ messenger.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Get the key corresponding to a tag ('' if tag does not exist)
 async function getTagKey(tag) {
     //console.log('Background: Getting key for',tag) ;
-    let tags = await messenger.messages.listTags();
+    let tags = await messenger.messages.tags.list();
     let key = ''
     tags.forEach(element => {
     	if (element.tag === tag) {
