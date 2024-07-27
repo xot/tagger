@@ -50,15 +50,24 @@ async function getTagKey(tag) {
 
 function addTag(tag) {
     console.log("Popup: Adding new tag:", tag) ;
-    // key must match /^[$a-zA-Z0-9]+$/)
-    // (this is different for tags created through the manage tags
-    // interface...)
+    // Thunderbird really doesnt line keys with non-ASCII characters, but has
+    // no problem with such characters in the tag itself.
+    //
     // make lowercase, trim and remove all illegal chars
     let key = tag.toLowerCase() ;
     key = key.trim() ;
+    // encode spaces as _ as the native tag system of Thunderbird does.
     key = key.replaceAll(/[ ]/g,'_') ;
-    // TODO: be less strict and replace non-ASCII with ASCII chars, eg ä -> a
-    key = key.replaceAll(/[^$a-zA-Z0-9_]/g,'') ;
+    // be less strict and replace some non-ASCII with ASCII equivalents, eg ä -> a
+    key = key.replaceAll(/[äàáå]/g,'a') ;
+    key = key.replaceAll(/[çćĉč]/g,'c') ;
+    key = key.replaceAll(/[ëèé]/g,'e') ;
+    key = key.replaceAll(/[ïìí]/g,'i') ;
+    key = key.replaceAll(/[ñ]/g,'n') ;    
+    key = key.replaceAll(/[öòóø]/g,'o') ;
+    key = key.replaceAll(/[šß]/g,'s') ;    
+    key = key.replaceAll(/[üùú]/g,'u') ;
+    key = key.replaceAll(/[^$a-zA-Z0-9_]/g,'x') ;
     //key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
     console.log("Popup: With key:", key) ;
     messenger.messages.tags.create(key,tag,"#000000");
