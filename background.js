@@ -59,7 +59,7 @@ function addTag(tag) {
     //key = key.replaceAll(/[^$a-zA-Z0-9]/g,'') ;
     key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
     console.log("Popup: With key:", key) ;
-    messenger.messages.createTag(key,tag,"#000000");
+    messenger.messages.tags.create(key,tag,"#000000");
     return key;
     // TODO: this is what we shoudl use to create the same key Thunderbird would
     //MailServices.tags.addTag(tag,"#000000", "");
