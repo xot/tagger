@@ -45,7 +45,7 @@ async function init() {
     // and a tag; the key is a normalised version of the tag used internally
     // by Thunderbird: no uppercase, and spaces changed to underscore.
     //console.log('Popup: Getting tags')
-    let tags = await messenger.messages.listTags();
+    let tags = await messenger.messages.tags.list();
 
     // construct an option list for the input selector
     let knowntags = '';
