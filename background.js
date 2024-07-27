@@ -56,8 +56,10 @@ function addTag(tag) {
     // make lowercase, trim and remove all illegal chars
     let key = tag.toLowerCase() ;
     key = key.trim() ;
-    //key = key.replaceAll(/[^$a-zA-Z0-9]/g,'') ;
-    key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
+    key = key.replaceAll(/[ ]/g,'_') ;
+    // TODO: be less strict and replace non-ASCII with ASCII chars, eg ä -> a
+    key = key.replaceAll(/[^$a-zA-Z0-9_]/g,'') ;
+    //key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
     console.log("Popup: With key:", key) ;
     messenger.messages.tags.create(key,tag,"#000000");
     return key;
