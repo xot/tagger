@@ -32,7 +32,6 @@
 	"messagesUpdate",
 	"messagesTags",
 	"messagesTagsList",
-	"messagesUpdate",
 	"storage"
     ],
     "background": {
