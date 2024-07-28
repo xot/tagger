@@ -56,26 +56,20 @@ async function createTag(key,tag) {
 // when creating this tag through Manage Tags... 
 async function addTag(tag) {
     console.log("Popup: Adding new tag:", tag) ;
-    // Create a unique key for the tag.
-    // This is not as easy as it seems because Thunderbird really doesnt like
-    // keys with non-ASCII characters (even though the API now allows such
-    // keys to be created).
-    // TB has no problem with such characters in the tag itself.
+    // Create a unique key for the tag. This is not as easy as it seems
+    // because Thunderbird really doesnt like keys with non-ASCII characters
+    // (even though the API now allows such keys to be created).
+    // Note TB has no problem with such characters in the tag itself.
     //
-    // make lowercase, trim and remove all illegal chars
-    let key = tag.toLowerCase() ;
-    key = key.trim() ;
-    // encode spaces as _ as the native tag system of Thunderbird does.
+    // Our solution: trim the tag, replace ' ' with _, transform to UTF8,
+    // make lowercase and remove all illegal chars; this creates its key
+    let key = tag.trim() ;
+    // space -> _
     key = key.replaceAll(/[ ]/g,'_') ;
-    // be less strict and replace some non-ASCII with ASCII equivalents, eg ä -> a
-    key = key.replaceAll(/[äàáå]/g,'a') ;
-    key = key.replaceAll(/[çćĉč]/g,'c') ;
-    key = key.replaceAll(/[ëèé]/g,'e') ;
-    key = key.replaceAll(/[ïìí]/g,'i') ;
-    key = key.replaceAll(/[ñ]/g,'n') ;    
-    key = key.replaceAll(/[öòóø]/g,'o') ;
-    key = key.replaceAll(/[šß]/g,'s') ;    
-    key = key.replaceAll(/[üùú]/g,'u') ;
+    // to UTF8
+    key = encodeURI(key);
+    // TB does not like uppercase in keys
+    key = key.toLowerCase(key) ;
     // replace any remaining non basic ASCII chars with x
     key = key.replaceAll(/[^-$a-zA-Z0-9_]/g,'x') ;
     //officially the below strategy should work, and indeed tags.create() would
@@ -83,7 +77,7 @@ async function addTag(tag) {
     //keys in the end. So we use the above.
     //key = key.replaceAll(/[ ()/{%*<>"]/g,'x') ;
     console.log("Popup: Trying key:", key) ;
-    // avoid collisions with existing keys
+    // avoid collisions with existing keys just in case
     var success = await createTag(key,tag);
     while (! success) {
 	key = key + "x" ;
