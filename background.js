@@ -1,11 +1,3 @@
-//TODO: https://developer.thunderbird.net/add-ons/updating/tb102/adapt-to-changes-in-thunderbird-92-102#chromeutils.import
-//var { MailServices } = ChromeUtils.importESModule(
-//  "resource:///modules/MailServices.sys.mjs"
-//);
-//
-// MAYBE USE Experiment APIs, see https://developer.thunderbird.net/add-ons/mailextensions
-
-
 /**
  * Part I: Handlign tagging popup
  */
@@ -48,10 +40,27 @@ async function getTagKey(tag) {
     return key;
 }
 
-function addTag(tag) {
+// create a key,tag pair, return true if succesful, false if not
+async function createTag(key,tag) {
+    try {
+	await messenger.messages.tags.create(key,tag,"#000000");
+	return true;
+    } catch (error) {
+	return false;
+    }
+}
+
+// add a new tag to the database of Thunderbird tags; creates a unique key for
+// this tag, which is returned as function result. (The key returned for tags
+// with non-ASCII chacaters is NOT THE SAME as Thunderbird itself would create
+// when creating this tag through Manage Tags... 
+async function addTag(tag) {
     console.log("Popup: Adding new tag:", tag) ;
-    // Thunderbird really doesnt like keys with non-ASCII characters, but has
-    // no problem with such characters in the tag itself.
+    // Create a unique key for the tag.
+    // This is not as easy as it seems because Thunderbird really doesnt like
+    // keys with non-ASCII characters (even though the API now allows such
+    // keys to be created).
+    // TB has no problem with such characters in the tag itself.
     //
     // make lowercase, trim and remove all illegal chars
     let key = tag.toLowerCase() ;
@@ -67,19 +76,23 @@ function addTag(tag) {
     key = key.replaceAll(/[öòóø]/g,'o') ;
     key = key.replaceAll(/[šß]/g,'s') ;    
     key = key.replaceAll(/[üùú]/g,'u') ;
-    key = key.replaceAll(/[^$a-zA-Z0-9_]/g,'x') ;
-    //officially this should work, and indeed tags.create() would accept
-    //any key without [ ()/{%*<>"], but Thunderbird doesn't grok such keys
-    //in the end.
-    //key = key.replaceAll(/[ ()/{%*<>"]/g,'') ;
-    console.log("Popup: With key:", key) ;
-    messenger.messages.tags.create(key,tag,"#000000");
+    // replace any remaining non basic ASCII chars with x
+    key = key.replaceAll(/[^-$a-zA-Z0-9_]/g,'x') ;
+    //officially the below strategy should work, and indeed tags.create() would
+    //accept any key without [ ()/{%*<>"], but Thunderbird doesn't grok such
+    //keys in the end. So we use the above.
+    //key = key.replaceAll(/[ ()/{%*<>"]/g,'x') ;
+    console.log("Popup: Trying key:", key) ;
+    // avoid collisions with existing keys
+    var success = await createTag(key,tag);
+    while (! success) {
+	key = key + "x" ;
+	console.log("Popup: Trying key:", key) ;
+	success = await createTag(key,tag);
+    }
+    console.log("Popup: Using key:", key) ;
     return key;
-    // TODO: this is what we shoudl use to create the same key Thunderbird would
-    //MailServices.tags.addTag(tag,"#000000", "");
-    //return MailServices.tags.getKeyForTag(tag);
 }
-
 
 // Get the currently selected messages
 async function* selectedMessagesList() {
@@ -87,7 +100,6 @@ async function* selectedMessagesList() {
   for (let message of page.messages) {
     yield message;
   }
-
   while (page.id) {
     page = await messenger.messages.continueList(page.id);
     for (let message of page.messages) {
@@ -96,6 +108,7 @@ async function* selectedMessagesList() {
   }
 }
 
+// tag the currently selected messages with the tag using key
 async function tagMessages(tag,key) {
     //console.log("Background: Tagging messages with ", tag, key);
     let messages = selectedMessagesList();
@@ -107,6 +120,7 @@ async function tagMessages(tag,key) {
     };
 }
 
+// remove all tags on the currently selected messages
 async function clearMessages(tag,key) {
     //console.log("Background: Clearing message tags.");
     let messages = selectedMessagesList();
@@ -128,7 +142,7 @@ async function commandHandler(message, sender) {
  	await tagMessages(tag,key);
     }
     else if (command == 'new' && (key == '')) {
-	key = addTag(tag) ;
+	key = await addTag(tag) ;
  	await tagMessages(tag,key);
     }
     else if (command == 'clear') {
@@ -142,7 +156,7 @@ async function commandHandler(message, sender) {
  * of message replied to.
  */
 
-// The actual (asynchronous) handler for incoming messages.
+// The actual (asynchronous) handler for incoming email messages.
 async function newMailHandler(folder,messageList) {
     var val = await messenger.storage.local.get('tagreplies') ;
     if (!val.tagreplies) {
@@ -177,18 +191,7 @@ async function newMailHandler(folder,messageList) {
     }
 }
 
-
-//async function folderUpdatedHandler(folder, folderInfo) {
-//    console.log("Event triggered for account folder",folder,folderInfo) ;
-//    let result = await messenger.messages.query( {folderId: folder.id} ) ;
-//    console.log(result) ;
-//}
-
 // Handle incoming new message from a server
 browser.messages.onNewMailReceived.addListener((folder, messageList) => {
     newMailHandler(folder,messageList);    
 });
-// Also handle new messages stored in folder, e.g. my own replies
-//messenger.folders.onFolderInfoChanged.addListener((folder, folderInfo) => {
-//    folderUpdatedHandler(folder, folderInfo); 
-//}) ;
