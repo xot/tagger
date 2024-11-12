@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Tagger",
     "description": "Tagging messages by autocompletion",
-    "version": "1.4",
+    "version": "1.5",
     "author": "Jaap-Henk Hoepman",
     "browser_specific_settings": {
         "gecko": {
