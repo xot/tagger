@@ -18,7 +18,7 @@
     "options_ui": {
       "page": "options.html",
       "open_in_tab": false,
-      "browser_style": true
+      "browser_style": false
     },
     "commands": {
 	"_execute_browser_action": {
